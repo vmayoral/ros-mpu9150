@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(mpu9150)
+project(ros_mpu9150)
 
 find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs)
 
@@ -26,8 +26,14 @@ include_directories(
 #link_directories()
 
 
+# Test to verify simple ROS node
 add_executable(random src/random.cpp)
 target_link_libraries(random ${catkin_LIBRARIES} )
+
+# The MPU9150 node
+
+# Adds flags to the compiler command line for sources in the current directory and below.
+add_definitions(-DEMPL_TARGET_LINUX -DMPU9150 -DAK8975_SECONDARY)
 
 add_executable(mpu9150_node src/mpu9150_node.cpp)
 add_library(quaternion SHARED src/linux-mpu9150/mpu9150/quaternion.c)

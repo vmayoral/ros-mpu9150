@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>mpu9150</name>
+  <name>ros_mpu9150</name>
   <version>0.0.0</version>
   <description>The mpu9150 package</description>
 

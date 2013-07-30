@@ -27,9 +27,19 @@
 #include <getopt.h>
 #include <errno.h>
 
-#include "mpu9150.h"
-#include "linux_glue.h"
-#include "local_defaults.h"
+// Needed when mixing C and C++ code/libraries
+#ifdef __cplusplus
+    extern "C" {
+#endif
+        #include "mpu9150.h"
+        #include "linux_glue.h"
+        #include "local_defaults.h"
+
+#ifdef __cplusplus
+    }
+#endif
+
+
 
 int set_cal(int mag, char *cal_file);
 void read_loop(unsigned int sample_rate);

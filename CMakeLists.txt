@@ -4,7 +4,7 @@ project(ros_mpu9150)
 find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs)
 
 catkin_package(
-   INCLUDE_DIRS include
+   INCLUDE_DIRS 
 #  LIBRARIES mpu9150
 #  CATKIN_DEPENDS roscpp rospy std_msgs
 #  DEPENDS system_lib

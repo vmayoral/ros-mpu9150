@@ -48,4 +48,5 @@ target_link_libraries(mpu9150_node linux_glue mpu9150 inv_mpu quaternion inv_mpu
 #target_link_libraries(mpu9150_node ${catkin_LIBRARIES})
 
 install(TARGETS mpu9150_node linux_glue mpu9150 inv_mpu quaternion inv_mpu_dmp_motion_driver vector3d
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

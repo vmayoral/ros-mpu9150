@@ -47,5 +47,5 @@ add_library(inv_mpu_dmp_motion_driver SHARED src/linux-mpu9150/eMPL/inv_mpu_dmp_
 target_link_libraries(mpu9150_node linux_glue mpu9150 inv_mpu quaternion inv_mpu_dmp_motion_driver vector3d ${catkin_LIBRARIES})
 #target_link_libraries(mpu9150_node ${catkin_LIBRARIES})
 
-install(TARGETS mpu9150_node
+install(TARGETS mmpu9150_node linux_glue mpu9150 inv_mpu quaternion inv_mpu_dmp_motion_driver vector3d
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

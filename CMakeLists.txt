@@ -37,20 +37,20 @@ add_definitions(-DEMPL_TARGET_LINUX -DMPU9150 -DAK8975_SECONDARY)
 add_executable(mpu9150_node src/mpu9150_node.cpp)
 add_library(mpu9150 SHARED src/linux-mpu9150/mpu9150/mpu9150.c)
 add_library(linux_glue SHARED src/linux-mpu9150/glue/linux_glue.c)
-add_library(quaternion SHARED src/linux-mpu9150/mpu9150/quaternion.c)
 add_library(vector3d SHARED src/linux-mpu9150/mpu9150/vector3d.c)
+add_library(quaternion SHARED src/linux-mpu9150/mpu9150/quaternion.c)
 add_library(inv_mpu SHARED src/linux-mpu9150/eMPL/inv_mpu.c)
 add_library(inv_mpu_dmp_motion_driver SHARED src/linux-mpu9150/eMPL/inv_mpu_dmp_motion_driver.c)
 target_link_libraries(mpu9150_node linux_glue mpu9150 inv_mpu quaternion inv_mpu_dmp_motion_driver vector3d ${catkin_LIBRARIES})
 #target_link_libraries(mpu9150_node ${catkin_LIBRARIES})
 
 # imu utility
-add_executable(imu src/linux-mpu9150/imu.c)
-target_link_libraries(imu linux_glue mpu9150 inv_mpu quaternion inv_mpu_dmp_motion_driver vector3d ${catkin_LIBRARIES})
+#add_executable(imu src/linux-mpu9150/imu.c)
+#target_link_libraries(imu vector3d linux_glue mpu9150 inv_mpu  quaternion inv_mpu_dmp_motion_driver)
 
 # imucal utility (calibration utility)
-add_executable(imucal src/linux-mpu9150/imucal.c)
-target_link_libraries(imucal linux_glue mpu9150 inv_mpu quaternion inv_mpu_dmp_motion_driver vector3d ${catkin_LIBRARIES})
+#add_executable(imucal src/linux-mpu9150/imucal.c)
+#target_link_libraries(imucal linux_glue mpu9150 inv_mpu quaternion inv_mpu_dmp_motion_driver vector3d ${catkin_LIBRARIES})
 
 install(TARGETS mpu9150_node linux_glue mpu9150 inv_mpu quaternion inv_mpu_dmp_motion_driver vector3d
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

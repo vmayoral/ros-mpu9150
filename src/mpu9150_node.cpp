@@ -3,15 +3,13 @@
  *
  *       Filename:  mpu9150_node.cpp
  *
- *    Description:  
+ *    Description: ROS package that launches a node and publishes the Invensense MPU-9150 to a Topic  
  *
  *        Version:  1.0
  *        Created:  27/07/13 15:06:50
  *       Revision:  none
- *       Compiler:  gcc
  *
  *         Author:  Víctor Mayoral Vilches <v.mayoralv@gmail.com>
- *   Organization:  
  *
  * =====================================================================================
  */
@@ -52,16 +50,34 @@ void sigint_handler(int sig);
 
 int done;
 
+void usage(char *argv_0)
+{
+    printf("\nUsage: %s [options]\n", argv_0);
+    printf("  -b <i2c-bus>          The I2C bus number where the IMU is. The default is 1 to use /dev/i2c-1.\n");
+    printf("  -s <sample-rate>      The IMU sample rate in Hz. Range 2-50, default 10.\n");
+    printf("  -y <yaw-mix-factor>   Effect of mag yaw on fused yaw data.\n");
+    printf("                           0 = gyro only\n");
+    printf("                           1 = mag only\n");
+    printf("                           > 1 scaled mag adjustment of gyro data\n");
+    printf("                           The default is 4.\n");
+    printf("  -a <accelcal file>    Path to accelerometer calibration file. Default is ./accelcal.txt\n");
+    printf("  -m <magcal file>      Path to mag calibration file. Default is ./magcal.txt\n");
+    printf("  -v                    Verbose messages\n");
+    printf("  -h                    Show this help\n");
+
+    printf("\nExample: %s -b3 -s20 -y10\n\n", argv_0);
+
+    exit(1);
+}
+
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "mpu9150");
-
   ros::NodeHandle n;
-
   ros::Publisher chatter_pub = n.advertise<std_msgs::String>("mpu9150_topic", 1000);
   ros::Rate loop_rate(10);
 
-  /* Init the sensor */
+  /* Init the sensor the values are hardcoded at the local_defaults.h file */
     int opt, len;
 	int i2c_bus = DEFAULT_I2C_BUS;
 	int sample_rate = DEFAULT_SAMPLE_RATE_HZ;
@@ -72,31 +88,95 @@ int main(int argc, char **argv)
 	unsigned long loop_delay;
 	mpudata_t mpu;
 
+    // receive the parameters and process them
+    while ((opt = getopt(argc, argv, "b:s:y:a:m:vh")) != -1) {
+        switch (opt) {
+        case 'b':
+            i2c_bus = strtoul(optarg, NULL, 0);
+
+            if (errno == EINVAL)
+                usage(argv[0]);
+
+            if (i2c_bus < MIN_I2C_BUS || i2c_bus > MAX_I2C_BUS)
+                usage(argv[0]);
+
+            break;
+
+        case 's':
+            sample_rate = strtoul(optarg, NULL, 0);
+
+            if (errno == EINVAL)
+                usage(argv[0]);
+
+            if (sample_rate < MIN_SAMPLE_RATE || sample_rate > MAX_SAMPLE_RATE)
+                usage(argv[0]);
+
+            break;
+
+        case 'y':
+            yaw_mix_factor = strtoul(optarg, NULL, 0);
+
+            if (errno == EINVAL)
+                usage(argv[0]);
+
+            if (yaw_mix_factor < 0 || yaw_mix_factor > 100)
+                usage(argv[0]);
+
+            break;
+
+        case 'a':
+            len = 1 + strlen(optarg);
+
+            accel_cal_file = (char *)malloc(len);
+
+            if (!accel_cal_file) {
+                perror("malloc");
+                exit(1);
+            }
+
+            strcpy(accel_cal_file, optarg);
+            break;
+
+        case 'm':
+            len = 1 + strlen(optarg);
+
+            mag_cal_file = (char *)malloc(len);
+
+            if (!mag_cal_file) {
+                perror("malloc");
+                exit(1);
+            }
+
+            strcpy(mag_cal_file, optarg);
+            break;
+
+        case 'v':
+            verbose = 1;
+            break;
+
+        case 'h':
+        default:
+            usage(argv[0]);
+            break;
+        }
+    }
+
 	register_sig_handler();
-
 	mpu9150_set_debug(verbose);
-
 	if (mpu9150_init(i2c_bus, sample_rate, yaw_mix_factor))
 		exit(1);
-
 	set_cal(0, accel_cal_file);
 	set_cal(1, mag_cal_file);
-
 	if (accel_cal_file)
 		free(accel_cal_file);
-
 	if (mag_cal_file)
 		free(mag_cal_file);
-
 	memset(&mpu, 0, sizeof(mpudata_t));
-
 	if (sample_rate == 0)
 		return -1;
 
 	loop_delay = (1000 / sample_rate) - 2;
-
 	printf("\nEntering MPU read loop (ctrl-c to exit)\n\n");
-
 	linux_delay_ms(loop_delay);
 
   /**
@@ -106,21 +186,11 @@ int main(int argc, char **argv)
   int count = 0;
   while (ros::ok())
   {
-    /*
-    std_msgs::String msg;
-    std::stringstream ss;
-
-    ss << "hello world " << count;
-    msg.data = ss.str();
-
-    ROS_INFO("%s", msg.data.c_str());
-    */
-    
     std_msgs::String msg;
     std::stringstream ss;
 
 	if (mpu9150_read(&mpu) == 0) {
-		print_fused_euler_angles(&mpu);
+		//print_fused_euler_angles(&mpu);
 	    //ss << "\rX: %0.0f Y: %0.0f Z: %0.0f        ",
 	    ss << "\rX: " << mpu.fusedEuler[VEC3_X] * RAD_TO_DEGREE <<
             " Y: " << mpu.fusedEuler[VEC3_Y] * RAD_TO_DEGREE <<
@@ -131,15 +201,11 @@ int main(int argc, char **argv)
 	    // print_calibrated_mag(&mpu);
 
        msg.data = ss.str();
-       ROS_INFO("%s", msg.data.c_str());
+       ROS_INFO("ROS_INFO: %s", msg.data.c_str());
 	}
-
 	linux_delay_ms(loop_delay);
-
     chatter_pub.publish(msg);
-
     ros::spinOnce();
-
     loop_rate.sleep();
     ++count;
   }

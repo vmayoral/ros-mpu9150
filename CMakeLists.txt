@@ -55,3 +55,7 @@ target_link_libraries(mpu9150_node linux_glue mpu9150 inv_mpu quaternion inv_mpu
 install(TARGETS mpu9150_node linux_glue mpu9150 inv_mpu quaternion inv_mpu_dmp_motion_driver vector3d
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
+
+install(FILES src/accelcal.txt src/magcal.txt DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+install(DIRECTORY src/linux-mpu9150 DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

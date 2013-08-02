@@ -38,7 +38,6 @@
 #endif
 
 
-
 int set_cal(int mag, char *cal_file);
 void read_loop(unsigned int sample_rate);
 void print_fused_euler_angles(mpudata_t *mpu);
@@ -105,11 +104,15 @@ int main(int argc, char **argv)
         case 's':
             sample_rate = strtoul(optarg, NULL, 0);
 
-            if (errno == EINVAL)
+            if (errno == EINVAL){
+                printf("EINVAL\n");
                 usage(argv[0]);
+            }
 
-            if (sample_rate < MIN_SAMPLE_RATE || sample_rate > MAX_SAMPLE_RATE)
+            if (sample_rate < MIN_SAMPLE_RATE || sample_rate > MAX_SAMPLE_RATE){
+                printf("sample rate problem\n");
                 usage(argv[0]);
+            }
 
             break;
 
@@ -203,9 +206,9 @@ int main(int argc, char **argv)
 	    // print_calibrated_mag(&mpu);
 
        msg.data = ss.str();
-       ROS_INFO("ROS_INFO: %s", msg.data.c_str());
+       ROS_INFO("ROS_INFO: %s\n", msg.data.c_str());
 	}
-	linux_delay_ms(loop_delay);
+//	linux_delay_ms(loop_delay);
     chatter_pub.publish(msg);
     ros::spinOnce();
     loop_rate.sleep();

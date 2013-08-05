@@ -73,7 +73,7 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "mpu9150");
   ros::NodeHandle n;
-  ros::Publisher chatter_pub = n.advertise<std_msgs::String>("mpu9150_topic", 1000);
+  ros::Publisher chatter_pub = n.advertise<std_msgs::String>("imu_euler", 1000);
   ros::Rate loop_rate(10);
 
   /* Init the sensor the values are hardcoded at the local_defaults.h file */
